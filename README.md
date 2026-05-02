@@ -1,1 +1,18 @@
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et dapibus magna. Nulla feugiat, sapien ac vulputate tristique, odio augue efficitur tortor, eu consectetur sapien lectus sit amet velit. Ut tristique eget ligula id aliquet. Sed ornare dapibus lobortis. Donec id porttitor arcu. Nullam magna enim, iaculis a imperdiet in, vehicula sed leo. Vestibulum fermentum pharetra blandit. Curabitur rutrum massa a sapien tristique consequat. Sed luctus orci purus, tincidunt ultricies nibh mattis a. Donec lacinia, libero id aliquam pulvinar, odio nisi feugiat orci, lacinia dictum est metus id dui. Fusce at porttitor ipsum. Donec dignissim, justo et faucibus interdum, lorem nisl pulvinar metus, sit amet mollis ipsum tellus ut dui. Vestibulum non eleifend lectus.
+<div align="center"> 
+    <p>
+        <h1>Nitra Tech Innovation</h1>
+        Backend
+    </p>
+    <br/>
+</div>
+
+## Contributors
+
+- [Matúš Kovár](https://github.com/theAntarux)
+- [Matúš Gabaš](https://github.com/matusgabas)
+- [Emma Kohútová](https://github.com/Emma04Koh)
+- [Juraj Daniš](https://github.com/Jur1n0)
+
+## License
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
