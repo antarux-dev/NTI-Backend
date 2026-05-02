@@ -2,18 +2,33 @@
   "name": "nti-backend",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint . --ext .ts --max-warnings=20",
+    "lint:fix": "eslint . --ext .ts --fix && prettier --write .",
+    "type-check": "tsc --noEmit",
+    "vitest": "vitest run",
+    "vitest:watch": "vitest watch"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^6.0.3"
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "eslint": "^10.2.0",
+    "prettier": "^3.8.3",
+    "tsx": "^4.19.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.58.2",
+    "vitest": "^4.1.4"
   }
 }
