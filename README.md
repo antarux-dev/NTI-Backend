@@ -6,6 +6,15 @@
     <br/>
 </div>
 
+<p align="center">
+   <a href="https://github.com/antarux-dev/NTI-Backend/actions">
+      <img src="https://github.com/antarux-dev/NTI-Backend/actions/workflows/ci.yml/badge.svg" alt="ci status"/>
+   </a>
+    <a href="https://github.com/antarux-dev/NTI-Backend/actions">
+      <img src="https://github.com/antarux-dev/NTI-Backend/actions/workflows/cd.yml/badge.svg" alt="cd status"/>
+   </a>
+</p>
+
 ## Contributors
 
 - [Matúš Kovár](https://github.com/theAntarux)
