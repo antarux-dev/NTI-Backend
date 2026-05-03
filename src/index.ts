@@ -1,17 +1,6 @@
-import express, { Request, Response } from 'express';
+import app from './app.js';
 
-const app = express();
 const PORT = 3000;
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    error: 'Route not found',
-    message: `These aren't the endpoints you're looking for.`,
-  });
-});
 
 app.listen(PORT, () => {
   console.warn('Server suprisingly successfully started ?!');
