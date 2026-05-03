@@ -1,0 +1,63 @@
+name: cd
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    name: Backend deployment
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Create docker image
+        run: docker build -t nti-backend:${{ github.ref_name }} .
+
+      - name: Save docker image
+        run: docker save nti-backend:${{ github.ref_name }} -o backend.tar
+
+      - name: Perms setup
+        run: chmod 644 backend.tar
+
+      - name: Copy files to vps
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 167.86.67.94
+          username: deploy
+          port: 6742
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: 'backend.tar'
+          target: '/opt/nti/backend/'
+          overwrite: true
+
+      - name: Run deployment on vps
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 167.86.67.94
+          username: deploy
+          port: 6742
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/nti/backend
+
+            docker load -i backend.tar
+            rm -f backend.tar
+
+            docker stop nti-backend-test || true
+            docker rm -f nti-backend-test || true
+
+            docker run -d \
+              --name nti-backend-test \
+              --restart unless-stopped \
+              -p 3000:3000 \
+              nti-backend:${{ github.ref_name }}
+
+            docker image prune -f --filter "until=168h"
