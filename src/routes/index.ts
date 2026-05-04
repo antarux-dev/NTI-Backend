@@ -1,16 +1,21 @@
 import { Router, Request, Response } from 'express';
-import testRouter from './test.js';
+import { createApiResponse } from '../utils/apiResponse.js';
+
+import testRouter from '../features/test/route.js';
 
 const router = Router();
+const API_PREFIX = 'v1';
 
-router.use('/test', testRouter);
+router.use(`/${API_PREFIX}/test`, testRouter);
 
 router.use((req: Request, res: Response) => {
-  res.status(404).json({
-    error: 'Route not found',
-    message: `These aren't the endpoints you're looking for.`,
-    path: req.path,
-  });
+  const response = createApiResponse(
+    404,
+    false,
+    `These aren't the endpoints you're looking for.`
+  );
+
+  res.status(response.statusCode).json(response);
 });
 
 export default router;
