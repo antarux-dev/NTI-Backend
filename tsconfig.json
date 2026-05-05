@@ -5,6 +5,14 @@
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
     "rootDir": "./src",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@features/*": ["./src/features/*"],
+      "@config/*": ["./src/config/*"],
+      "@middleware/*": ["./src/middleware/*"],
+      "@types/*": ["./src/types/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

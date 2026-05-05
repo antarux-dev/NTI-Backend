@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "lint": "eslint . --ext .ts --max-warnings=20",
     "lint:fix": "eslint . --ext .ts --fix && prettier --write .",
@@ -26,6 +26,7 @@
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.3",
+    "tsc-alias": "^1.8.17",
     "tsx": "^4.19.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2",
