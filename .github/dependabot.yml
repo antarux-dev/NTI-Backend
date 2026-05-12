@@ -1,26 +1,26 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      time: "08:00"
-      timezone: "Europe/Bratislava"
+      interval: 'weekly'
+      time: '08:00'
+      timezone: 'Europe/Bratislava'
     open-pull-requests-limit: 10
     groups:
       production-minor-patch:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
       security-updates:
         applies-to: security-updates
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
     allow:
-      - dependency-type: "production"
-      - dependency-type: "development"
+      - dependency-type: 'production'
+      - dependency-type: 'development'
