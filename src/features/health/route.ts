@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getResponseMessage } from './controller.js';
+import { healthCheck } from './controller.js';
 
 const router = Router();
-router.get('/', getResponseMessage);
+router.get('/', healthCheck);
 
 export default router;
