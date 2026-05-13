@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '@utils/customErrors.js';
-import { createApiResponse } from '@/utils/apiResponse.js';
+import { sendApiResponse } from '@/utils/apiResponse.js';
 
 export const errorMiddleware = (
   err: Error,
@@ -28,6 +28,9 @@ export const errorMiddleware = (
   };
   console.error(errorLog); // Use better logging alternative for error logs...
 
-  const response = createApiResponse(statusCode, false, message);
-  res.status(response.statusCode).json(response);
+  sendApiResponse(res, {
+    status: statusCode,
+    success: false,
+    message: message
+  });
 };

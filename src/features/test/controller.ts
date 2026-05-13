@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { messageResponses } from './model.js';
-import { createApiResponse } from '@utils/apiResponse.js';
+import { sendApiResponse } from '@utils/apiResponse.js';
 import { ValidationError } from '@utils/customErrors.js';
 
 export const getResponseMessage = (req: Request, res: Response) => {
@@ -9,6 +9,12 @@ export const getResponseMessage = (req: Request, res: Response) => {
   }
 
   const message = messageResponses[Math.floor(Math.random() * messageResponses.length)];
-  const response = createApiResponse(200, true, message);
-  res.status(response.statusCode).json(response);
+  sendApiResponse(res, {
+    status: 200,
+    success: true,
+    message: "Generated random message!",
+    data: {
+      message: message
+    },
+  });
 };
