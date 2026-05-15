@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '@utils/customErrors.js';
 import { sendApiResponse } from '@/utils/apiResponse.js';
 import { isProduction } from '@/config/env.js';
+import { HTTP_STATUS } from '@config/httpStatus.js';
 
 export type error = {
   status: number,
@@ -21,8 +22,8 @@ export const errorMiddleware = (
   next: NextFunction,
 ) => {
   const error: error = {
-    status: 500,
-    message: err.message,
+    status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    message: err.message || "Internal Server Error",
     isExpectedError: false,
     timestamp: new Date().toISOString(),
     path: req.originalUrl,
@@ -33,8 +34,6 @@ export const errorMiddleware = (
     error.status = err.status;
     error.message = err.message;
     error.isExpectedError = err.isExpectedError;
-  } else if (err instanceof Error) {
-    error.message = err.message;
   }
 
   if (!error.isExpectedError ) {
@@ -50,7 +49,7 @@ export const errorMiddleware = (
     : error.message;
 
   const clientStatus = (isProduction && !error.isExpectedError)
-    ? 500
+    ? HTTP_STATUS.INTERNAL_SERVER_ERROR
     : error.status;
 
   sendApiResponse(res, {
