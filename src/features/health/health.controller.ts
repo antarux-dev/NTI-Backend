@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { messageResponses } from './model.js';
+import { messageResponses } from './health.model.js';
 import { sendApiResponse } from '@utils/apiResponse.js';
 import { HTTP_STATUS } from '@config/httpStatus.js';
 

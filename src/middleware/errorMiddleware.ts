@@ -5,13 +5,13 @@ import { isProduction } from '@/config/env.js';
 import { HTTP_STATUS } from '@config/httpStatus.js';
 
 export type error = {
-  status: number,
-  message: string,
-  isExpectedError: boolean,
-  timestamp: string,
-  stack?: string | undefined,
-  path: string,
-  method: string,
+  status: number;
+  message: string;
+  isExpectedError: boolean;
+  timestamp: string;
+  stack?: string | undefined;
+  path: string;
+  method: string;
 };
 
 export const errorMiddleware = (
@@ -19,11 +19,11 @@ export const errorMiddleware = (
   req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const error: error = {
     status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    message: err.message || "Internal Server Error",
+    message: err.message || 'Internal Server Error',
     isExpectedError: false,
     timestamp: new Date().toISOString(),
     path: req.originalUrl,
@@ -36,7 +36,7 @@ export const errorMiddleware = (
     error.isExpectedError = err.isExpectedError;
   }
 
-  if (!error.isExpectedError ) {
+  if (!error.isExpectedError) {
     error.stack = err.stack;
   }
 
@@ -44,17 +44,15 @@ export const errorMiddleware = (
   // https://getpino.io/#/
   console.error(error);
 
-  const responseMessage = (isProduction && !error.isExpectedError)
-    ? 'Internal Server Error'
-    : error.message;
+  const responseMessage =
+    isProduction && !error.isExpectedError ? 'Internal Server Error' : error.message;
 
-  const clientStatus = (isProduction && !error.isExpectedError)
-    ? HTTP_STATUS.INTERNAL_SERVER_ERROR
-    : error.status;
+  const clientStatus =
+    isProduction && !error.isExpectedError ? HTTP_STATUS.INTERNAL_SERVER_ERROR : error.status;
 
   sendApiResponse(res, {
     status: clientStatus,
     success: false,
-    message: responseMessage
+    message: responseMessage,
   });
 };

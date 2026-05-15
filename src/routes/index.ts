@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { NotFoundError } from '@utils/customErrors.js';
-import v1Router  from '@/routes/v1.js';
+import v1Router from '@/routes/v1.js';
 
 const router = Router();
 

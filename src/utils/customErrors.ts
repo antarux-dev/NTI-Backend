@@ -4,11 +4,7 @@ export class CustomError extends Error {
   public readonly status: number;
   public readonly isExpectedError: boolean;
 
-  constructor(
-    message: string, 
-    status: number = 500, 
-    isExpectedError: boolean = true
-  ) {
+  constructor(message: string, status: number = 500, isExpectedError: boolean = true) {
     super(message);
     this.status = status;
     this.isExpectedError = isExpectedError;
