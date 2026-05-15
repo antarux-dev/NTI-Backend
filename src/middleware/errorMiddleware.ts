@@ -1,33 +1,60 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '@utils/customErrors.js';
-import { createApiResponse } from '@/utils/apiResponse.js';
+import { sendApiResponse } from '@/utils/apiResponse.js';
+import { isProduction } from '@/config/env.js';
+import { HTTP_STATUS } from '@config/httpStatus.js';
+
+export type error = {
+  status: number,
+  message: string,
+  isExpectedError: boolean,
+  timestamp: string,
+  stack?: string | undefined,
+  path: string,
+  method: string,
+};
 
 export const errorMiddleware = (
   err: Error,
   req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  let statusCode = 500;
-  let message = 'Internal Server Error';
-  let isOperational = false;
+  const error: error = {
+    status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    message: err.message || "Internal Server Error",
+    isExpectedError: false,
+    timestamp: new Date().toISOString(),
+    path: req.originalUrl,
+    method: req.method,
+  };
 
   if (err instanceof CustomError) {
-    statusCode = err.statusCode;
-    message = err.message;
-    isOperational = err.isOperational;
-  } else if (err instanceof Error) {
-    message = err.message;
+    error.status = err.status;
+    error.message = err.message;
+    error.isExpectedError = err.isExpectedError;
   }
 
-  // TODO: Implement structured error logs...
-  const errorLog = {
-    message: err.message,
-    isOperational,
-  };
-  console.error(errorLog); // Use better logging alternative for error logs...
+  if (!error.isExpectedError ) {
+    error.stack = err.stack;
+  }
 
-  const response = createApiResponse(statusCode, false, message);
-  res.status(response.statusCode).json(response);
+  // TODO: Use pino logging for error loggin while the production
+  // https://getpino.io/#/
+  console.error(error);
+
+  const responseMessage = (isProduction && !error.isExpectedError)
+    ? 'Internal Server Error'
+    : error.message;
+
+  const clientStatus = (isProduction && !error.isExpectedError)
+    ? HTTP_STATUS.INTERNAL_SERVER_ERROR
+    : error.status;
+
+  sendApiResponse(res, {
+    status: clientStatus,
+    success: false,
+    message: responseMessage
+  });
 };
