@@ -58,6 +58,7 @@ jobs:
               --name nti-backend-test \
               --restart unless-stopped \
               -p 3000:3000 \
+              -e NODE_ENV=production \
               nti-backend:${{ github.ref_name }}
 
             docker image prune -f --filter "until=168h"

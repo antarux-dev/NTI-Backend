@@ -7,6 +7,7 @@ RUN npm run build
 
 FROM node:22-alpine
 WORKDIR /app
+ENV NODE_ENV=production
 COPY --from=build_stage /app/dist ./dist
 
 COPY package*.json ./
