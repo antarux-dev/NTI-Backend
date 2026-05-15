@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import healthRouter from '@features/health/route.js';
 import { NotFoundError } from '@utils/customErrors.js';
+import v1Router  from '@/routes/v1.js';
 
 const router = Router();
 
-router.use(`/health`, healthRouter);
+router.use(`/v1`, v1Router);
 
 router.use((req: Request, res: Response, next: NextFunction) => {
   next(new NotFoundError(`These aren't the endpoints you're looking for.`));
