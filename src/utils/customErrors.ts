@@ -1,11 +1,11 @@
 export class CustomError extends Error {
-  public readonly statusCode: number;
-  public readonly isOperational: boolean;
+  public readonly status: number;
+  public readonly isExpectedError: boolean;
 
-  constructor(message: string, statusCode: number = 500, isOperational: boolean = true) {
+  constructor(message: string, status: number = 500, isExpectedError: boolean = true) {
     super(message);
-    this.statusCode = statusCode;
-    this.isOperational = isOperational;
+    this.status = status;
+    this.isExpectedError = isExpectedError;
   }
 }
 

@@ -1,36 +1,61 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '@utils/customErrors.js';
 import { sendApiResponse } from '@/utils/apiResponse.js';
+import { isProduction } from '@/config/env.js';
+
+export type error = {
+  status: number,
+  message: string,
+  isExpectedError: boolean,
+  timestamp: string,
+  stack?: string | undefined,
+  path: string,
+  method: string,
+};
 
 export const errorMiddleware = (
   err: Error,
   req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  let statusCode = 500;
-  let message = 'Internal Server Error';
-  let isOperational = false;
+  const error: error = {
+    status: 500,
+    message: err.message,
+    isExpectedError: false,
+    timestamp: new Date().toISOString(),
+    path: req.originalUrl,
+    method: req.method,
+  };
 
   if (err instanceof CustomError) {
-    statusCode = err.statusCode;
-    message = err.message;
-    isOperational = err.isOperational;
+    error.status = err.status;
+    error.message = err.message;
+    error.isExpectedError = err.isExpectedError;
   } else if (err instanceof Error) {
-    message = err.message;
+    error.message = err.message;
   }
 
-  // TODO: Implement structured error logs...
-  const errorLog = {
-    message: err.message,
-    isOperational,
-  };
-  console.error(errorLog); // Use better logging alternative for error logs...
+  if (!error.isExpectedError ) {
+    error.stack = err.stack;
+  }
+
+  // TODO: Use pino logging for error loggin while the production
+  // https://getpino.io/#/
+  console.error(error);
+
+  const responseMessage = (isProduction && !error.isExpectedError)
+    ? 'Internal Server Error'
+    : error.message;
+
+  const clientStatus = (isProduction && !error.isExpectedError)
+    ? 500
+    : error.status;
 
   sendApiResponse(res, {
-    status: statusCode,
+    status: clientStatus,
     success: false,
-    message: message
+    message: responseMessage
   });
 };
