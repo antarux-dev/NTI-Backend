@@ -2,7 +2,7 @@ import express from 'express';
 import router from '@/routes/index.js';
 import { errorMiddleware } from '@middleware/errorMiddleware.js';
 import { corsMiddleware } from '@middleware/corsMiddleware.js';
-import { limiter, authLimiter } from '@middleware/rateLimitMiddleware.js';
+import { limiter } from '@middleware/rateLimitMiddleware.js';
 
 const app = express();
 
