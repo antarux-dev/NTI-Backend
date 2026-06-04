@@ -15,3 +15,5 @@ eslint*
 README.md
 LICENSE
 vitest.config.ts
+docker-compose*.yml
+Dockerfile

@@ -1,11 +1,15 @@
 services:
   backend:
+    container_name: backend
     build: .
     env_file: 
       - .env
     ports: 
       - "3000:3000"
-  db:
+    restart: on-failure
+    
+  database:
+    container_name: database
     image: postgres:latest
     env_file: 
       - .env
@@ -13,6 +17,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+    restart: unless-stopped
 
 volumes:
   postgres_data:
