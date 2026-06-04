@@ -8,3 +8,10 @@ coverage
 .DS_Store
 .env*
 *.tar
+.vscode
+.editorconfig
+.prettier*
+eslint*
+README.md
+LICENSE
+vitest.config.ts
