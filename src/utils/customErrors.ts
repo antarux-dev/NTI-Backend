@@ -46,3 +46,9 @@ export class InternalServerError extends CustomError {
     super(message, HTTP_STATUS.INTERNAL_SERVER_ERROR, false);
   }
 }
+
+export class ExceededRateLimitError extends CustomError {
+  constructor(message: string = 'Too many requests') {
+    super(message, HTTP_STATUS.TOO_MANY_REQUESTS);
+  }
+}

@@ -5,7 +5,7 @@ import { corsMiddleware } from '@middleware/corsMiddleware.js';
 
 const app = express();
 
-app.use(corsMiddleware);
+app.use(corsMiddleware); // SHALL BE FIRST
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/', router);
