@@ -6,7 +6,7 @@ import { limiter } from '@middleware/rateLimitMiddleware.js';
 
 const app = express();
 
-app.use(corsMiddleware); // MUSI BYT PRVE
+app.use(corsMiddleware); // SHALL BE FIRST
 app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
