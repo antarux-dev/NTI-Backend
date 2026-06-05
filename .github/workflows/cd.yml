@@ -59,6 +59,5 @@ jobs:
             set -e
             cd /opt/nti/api.antarux.dev
 
-            docker pull ghcr.io/antarux-dev/nti-backend:${{ github.ref_name }}
             docker stack deploy -c docker-compose.prod.yml --with-registry-auth nti
             docker image prune -f --filter "until=168h"
