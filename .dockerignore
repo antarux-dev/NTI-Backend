@@ -6,5 +6,15 @@ dist
 coverage
 *.log
 .DS_Store
-.env*
+.env
+.env.*
 *.tar
+.vscode
+.editorconfig
+.prettier*
+eslint*
+README.md
+LICENSE
+vitest.config.ts
+docker-compose*.yml
+Dockerfile
