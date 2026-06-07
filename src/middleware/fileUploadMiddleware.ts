@@ -11,7 +11,7 @@ export const DOCUMENT_PATH = {
 
 interface UploaderOptions {
   path: string;
-  fileFilter?: Function;
+  fileFilter?: (req: Request, file: Express.Multer.File, next: (error: Error | null, acceptFile: boolean) => void) => void;
   limits?: number;
   preservePath?: boolean;
   defParamCharset?: string;
@@ -52,3 +52,4 @@ export const internalUploader = () => {
 };
 
 // TODO: Fukncia pre uloženie do db možno tu? inak v db middleware
+// TODO: Pridať custom errori pre možné chyby zo súbormi
