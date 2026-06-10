@@ -8,9 +8,8 @@ dotenv.config({
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
   PORT: z.coerce.number().default(3000),
-  CORS_ALLOWED_ORIGINS: z
-    .string()
-    .default('http://localhost:5173,https://antarux.dev,https://www.antarux.dev'),
+  CORS_ALLOWED_ORIGINS: z.string().default('http://localhost:5173'),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required...'),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
