@@ -66,6 +66,9 @@ jobs:
 
             cat > .env << 'EOF'
             DATABASE_URL=${{ secrets.VPS_DATABASE_URL }}
+            POSTGRES_USER=nti_db
+            POSTGRES_PASSWORD=${{ secrets.VPS_POSTGRES_PASSWORD }}
+            POSTGRES_DB=nti_production
             NODE_ENV=production
             PORT=3000
             EOF
