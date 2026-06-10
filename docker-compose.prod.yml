@@ -4,9 +4,9 @@ services:
     container_name: nti-database
     restart: unless-stopped
     environment:
-      POSTGRES_USER: nti_db
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: nti_production
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - nti_postgres_data:/var/lib/postgresql
     ports:
@@ -15,10 +15,6 @@ services:
   backend:
     image: ghcr.io/antarux-dev/nti-backend:${VERSION:-latest}
     restart: unless-stopped
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      DATABASE_URL: ${DATABASE_URL}
     env_file:
       - .env
     ports:

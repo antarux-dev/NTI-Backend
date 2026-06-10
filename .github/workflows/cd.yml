@@ -65,12 +65,13 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             cat > .env << 'EOF'
-            DATABASE_URL=${{ secrets.VPS_DATABASE_URL }}
-            POSTGRES_USER=nti_db
-            POSTGRES_PASSWORD=${{ secrets.VPS_POSTGRES_PASSWORD }}
-            POSTGRES_DB=nti_production
             NODE_ENV=production
             PORT=3000
+            CORS_ALLOWED_ORIGINS=${{ secrets.VPS_CORS_ALLOWED_ORIGINS }}
+            POSTGRES_USER=${{ secrets.VPS_POSTGRES_USERNAME }}
+            POSTGRES_PASSWORD=${{ secrets.VPS_POSTGRES_PASSWORD }}
+            POSTGRES_DB=${{ secrets.VPS_POSTGRES_DB }}
+            DATABASE_URL=postgresql://${{ secrets.VPS_POSTGRES_USERNAME }}:${{ secrets.VPS_POSTGRES_PASSWORD }}@database:5432/${{ secrets.VPS_POSTGRES_DB }}?schema=public
             EOF
 
             VERSION=${{ github.ref_name }} docker compose -f docker-compose.prod.yml pull
