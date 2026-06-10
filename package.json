@@ -7,12 +7,22 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
+
     "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "prisma:reset": "prisma migrate reset",
+
     "lint": "eslint . --ext .ts --max-warnings=20",
     "lint:fix": "eslint . --ext .ts --fix && prettier --write .",
     "type-check": "tsc --noEmit",
     "vitest": "vitest run",
-    "vitest:watch": "vitest watch"
+    "vitest:watch": "vitest watch",
+
+    "check": "npm run lint && npm run type-check && npm run vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
