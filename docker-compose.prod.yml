@@ -3,10 +3,8 @@ services:
     image: postgres:latest
     container_name: nti-database
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env
     volumes:
       - nti_postgres_data:/var/lib/postgresql
     ports:
