@@ -1,9 +1,334 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   moduleFormat = "esm"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model application_evaluation_scores {
+  evaluation_id    Int
+  call_criteria_id Int
+  score            Decimal       @db.Decimal(5, 2)
+  score_comment    String?
+  call_criteria    call_criteria @relation(fields: [call_criteria_id], references: [id], onUpdate: NoAction)
+  evaluations      evaluations   @relation(fields: [evaluation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([evaluation_id, call_criteria_id])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model applications {
+  id                 String             @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  call_id            Int
+  submitting_user_id Int
+  team_id            Int?
+  organization_id    Int?
+  status             application_status @default(draft)
+  submitted_at       DateTime?          @db.Timestamp(6)
+  created_at         DateTime           @default(now()) @db.Timestamp(6)
+  updated_at         DateTime           @default(now()) @db.Timestamp(6)
+  deleted_at         DateTime?          @db.Timestamp(6)
+  calls              calls              @relation(fields: [call_id], references: [id], onUpdate: NoAction)
+  organisations      organisations?     @relation(fields: [organization_id], references: [id], onUpdate: NoAction)
+  users              users              @relation(fields: [submitting_user_id], references: [id], onUpdate: NoAction)
+  teams              teams?             @relation(fields: [team_id], references: [id], onUpdate: NoAction)
+  attachments        attachments[]
+  evaluations        evaluations[]
+  mentorships        mentorships?
+}
+
+model attachments {
+  id             String                  @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  application_id String?                 @db.Uuid
+  original_name  String
+  storage_path   String
+  mime_type      String
+  file_size      BigInt
+  uploaded_by    Int
+  version        Int                     @default(1)
+  document_type  String
+  classification document_classification @default(internal)
+  created_at     DateTime                @default(now()) @db.Timestamp(6)
+  updated_at     DateTime                @default(now()) @db.Timestamp(6)
+  deleted_at     DateTime?               @db.Timestamp(6)
+  applications   applications?           @relation(fields: [application_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users          users                   @relation(fields: [uploaded_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model audit_events {
+  id            Int      @id @default(autoincrement())
+  table_name    String
+  record_id     String
+  action        String
+  actor_user_id Int?
+  old_values    Json?
+  new_values    Json?
+  created_at    DateTime @default(now()) @db.Timestamp(6)
+  users         users?   @relation(fields: [actor_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model call_criteria {
+  id                            Int                             @id @default(autoincrement())
+  call_id                       Int
+  name                          String
+  description                   String?
+  max_score                     Decimal                         @db.Decimal(5, 2)
+  weight                        Decimal                         @default(1.0) @db.Decimal(4, 2)
+  created_at                    DateTime                        @default(now()) @db.Timestamp(6)
+  updated_at                    DateTime                        @default(now()) @db.Timestamp(6)
+  deleted_at                    DateTime?                       @db.Timestamp(6)
+  application_evaluation_scores application_evaluation_scores[]
+  calls                         calls                           @relation(fields: [call_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model calls {
+  id            Int             @id @default(autoincrement())
+  program_id    Int
+  title         String
+  description   String?
+  open_date     DateTime        @db.Timestamp(6)
+  deadline      DateTime        @db.Timestamp(6)
+  status        call_status     @default(draft)
+  created_at    DateTime        @default(now()) @db.Timestamp(6)
+  updated_at    DateTime        @default(now()) @db.Timestamp(6)
+  deleted_at    DateTime?       @db.Timestamp(6)
+  applications  applications[]
+  call_criteria call_criteria[]
+  programs      programs        @relation(fields: [program_id], references: [id], onUpdate: NoAction)
+}
+
+model evaluations {
+  id                            Int                             @id @default(autoincrement())
+  application_id                String                          @db.Uuid
+  evaluator_user_id             Int
+  comments                      String?
+  decision                      decision_status?
+  overall_score                 Decimal?                        @db.Decimal(5, 2)
+  evaluated_at                  DateTime                        @default(now()) @db.Timestamp(6)
+  created_at                    DateTime                        @default(now()) @db.Timestamp(6)
+  updated_at                    DateTime                        @default(now()) @db.Timestamp(6)
+  deleted_at                    DateTime?                       @db.Timestamp(6)
+  application_evaluation_scores application_evaluation_scores[]
+  applications                  applications                    @relation(fields: [application_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users                         users                           @relation(fields: [evaluator_user_id], references: [id], onUpdate: NoAction)
+}
+
+model mentorships {
+  id             Int               @id @default(autoincrement())
+  application_id String            @unique @db.Uuid
+  mentor_user_id Int
+  status         mentorship_status @default(proposed)
+  start_date     DateTime?         @db.Timestamp(6)
+  end_date       DateTime?         @db.Timestamp(6)
+  notes          String?
+  created_at     DateTime          @default(now()) @db.Timestamp(6)
+  updated_at     DateTime          @default(now()) @db.Timestamp(6)
+  deleted_at     DateTime?         @db.Timestamp(6)
+  applications   applications      @relation(fields: [application_id], references: [id], onUpdate: NoAction)
+  users          users             @relation(fields: [mentor_user_id], references: [id], onUpdate: NoAction)
+  milestones     milestones[]
+}
+
+model milestones {
+  id              Int              @id @default(autoincrement())
+  mentorship_id   Int
+  title           String
+  description     String?
+  deadline        DateTime         @db.Timestamp(6)
+  status          milestone_status @default(pending)
+  completion_date DateTime?        @db.Timestamp(6)
+  notes           String?
+  created_at      DateTime         @default(now()) @db.Timestamp(6)
+  updated_at      DateTime         @default(now()) @db.Timestamp(6)
+  deleted_at      DateTime?        @db.Timestamp(6)
+  mentorships     mentorships      @relation(fields: [mentorship_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model organisation_members {
+  organisation_id      Int
+  user_id              Int
+  role_in_organisation String
+  is_primary_contact   Boolean       @default(false)
+  organisations        organisations @relation(fields: [organisation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users                users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, organisation_id])
+}
+
+model organisations {
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  ico                  String?                @unique
+  sector               String?
+  description          String?
+  website              String?
+  created_at           DateTime               @default(now()) @db.Timestamp(6)
+  updated_at           DateTime               @default(now()) @db.Timestamp(6)
+  deleted_at           DateTime?              @db.Timestamp(6)
+  applications         applications[]
+  organisation_members organisation_members[]
+}
+
+model programs {
+  id          Int       @id @default(autoincrement())
+  code        String
+  name        String
+  description String?
+  rules       Json?
+  created_at  DateTime  @default(now()) @db.Timestamp(6)
+  updated_at  DateTime  @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime? @db.Timestamp(6)
+  calls       calls[]
+}
+
+model roles {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String?
+  created_at  DateTime      @default(now()) @db.Timestamp(6)
+  updated_at  DateTime      @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime?     @db.Timestamp(6)
+  users_roles users_roles[]
+}
+
+model student_profiles {
+  id             Int       @id @default(autoincrement())
+  user_id        Int       @unique
+  study_program  String
+  study_year     Int
+  skills         Json?
+  grade_avg      Decimal?  @db.Decimal(4, 2)
+  cv_document_id String?   @db.Uuid
+  created_at     DateTime  @default(now()) @db.Timestamp(6)
+  updated_at     DateTime  @default(now()) @db.Timestamp(6)
+  deleted_at     DateTime? @db.Timestamp(6)
+  users          users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model teams {
+  id           Int            @id @default(autoincrement())
+  name         String
+  leader_id    Int
+  created_at   DateTime       @default(now()) @db.Timestamp(6)
+  updated_at   DateTime       @default(now()) @db.Timestamp(6)
+  deleted_at   DateTime?      @db.Timestamp(6)
+  applications applications[]
+  users        users          @relation(fields: [leader_id], references: [id], onUpdate: NoAction)
+  teams_users  teams_users[]
+}
+
+model teams_users {
+  team_id    Int
+  user_id    Int
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  updated_at DateTime  @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  teams      teams     @relation(fields: [team_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([team_id, user_id])
+}
+
+model users {
+  id                                        Int                    @id @default(autoincrement())
+  first_name                                String
+  last_name                                 String
+  email                                     String                 @unique
+  password_hash                             String
+  phone                                     String?
+  status                                    user_status            @default(pending)
+  email_verified                            Boolean                @default(false)
+  gdpr_consent                              Boolean                @default(false)
+  created_at                                DateTime               @default(now()) @db.Timestamp(6)
+  updated_at                                DateTime               @default(now()) @db.Timestamp(6)
+  deleted_at                                DateTime?              @db.Timestamp(6)
+  applications                              applications[]
+  attachments                               attachments[]
+  audit_events                              audit_events[]
+  evaluations                               evaluations[]
+  mentorships                               mentorships[]
+  organisation_members                      organisation_members[]
+  student_profiles                          student_profiles?
+  teams                                     teams[]
+  teams_users                               teams_users[]
+  users_roles_users_roles_granted_byTousers users_roles[]          @relation("users_roles_granted_byTousers")
+  users_roles_users_roles_user_idTousers    users_roles[]          @relation("users_roles_user_idTousers")
+}
+
+model users_roles {
+  user_id                             Int
+  role_id                             Int
+  granted_at                          DateTime @default(now()) @db.Timestamp(6)
+  granted_by                          Int?
+  users_users_roles_granted_byTousers users?   @relation("users_roles_granted_byTousers", fields: [granted_by], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  roles                               roles    @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_users_roles_user_idTousers    users    @relation("users_roles_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, role_id])
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum application_status {
+  draft
+  submitted
+  formal_check
+  under_review
+  revision_requested
+  approved
+  rejected
+  onboarding
+  active
+  completed
+  archived
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum call_status {
+  draft
+  open
+  closed
+  evaluating
+  finished
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum decision_status {
+  approve
+  reject
+  revise
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum document_classification {
+  public
+  internal
+  confidential
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum mentorship_status {
+  proposed
+  active
+  paused
+  completed
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum milestone_status {
+  pending
+  in_progress
+  completed
+  delayed
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum user_status {
+  pending
+  active
+  suspended
+  deleted
 }
