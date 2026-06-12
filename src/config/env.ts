@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
+import dotenvExpand from 'dotenv-expand';
 import { z } from 'zod';
 
-dotenv.config({
+dotenvExpand.expand(dotenv.config({
   quiet: true,
-});
+}));
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
