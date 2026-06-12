@@ -12,17 +12,8 @@ type State = 'up' | 'down';
 type ServiceStates = Record<string, State>;
 
 const availableServices: Service[] = [
-  {
-    name: 'db',
-    check: () => prisma.$queryRaw`SELECT 1`,
-  },
-  {
-    name: 'test',
-    check: () =>
-      new Promise((resolve, reject) => {
-        reject();
-      }),
-  },
+  { name: 'db', check: () => prisma.$queryRaw`SELECT 1` },
+  // { name: 'test', check: () => Promise.reject(new Error('Test service is down')) }, // Len test, nechat zakomentovane!
 ];
 
 async function getServiceState(check: () => Promise<unknown>): Promise<State> {
@@ -54,13 +45,39 @@ async function getServicesStates(services: Service[]): Promise<ServiceStates> {
   return serviceStates;
 }
 
+function resolveAppHttpStatus(serviceStates: ServiceStates): { status: number; success: boolean } {
+  const states = Object.values(serviceStates);
+  const totalServices = states.length;
+  const healthyServices = states.filter((s) => s === 'up').length;
+
+  if (healthyServices === totalServices) {
+    return {
+      status: HTTP_STATUS.OK,
+      success: true,
+    };
+  }
+
+  if (healthyServices > 0) {
+    return {
+      status: HTTP_STATUS.FAILED_DEPENDENCY,
+      success: false,
+    };
+  }
+
+  return {
+    status: HTTP_STATUS.SERVICE_UNAVAILABLE,
+    success: false,
+  };
+}
+
 export const getAppHealth = async (req: Request, res: Response) => {
   const message = messageResponses[Math.floor(Math.random() * messageResponses.length)];
   const services = await getServicesStates(availableServices);
+  const { status, success } = resolveAppHttpStatus(services);
 
   sendApiResponse(res, {
-    status: HTTP_STATUS.OK,
-    success: true,
+    status: status,
+    success: success,
     message: message,
     data: {
       services,

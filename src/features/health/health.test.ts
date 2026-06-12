@@ -47,7 +47,6 @@ describe('Health Controller API', () => {
       data: {
         services: {
           db: 'up',
-          test: 'down',
         },
         uptime: expect.any(Number),
       },
