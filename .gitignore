@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 
 /src/generated/prisma
+/prisma/src/generated

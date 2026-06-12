@@ -5,8 +5,8 @@ import { HTTP_STATUS } from '@config/httpStatus.js';
 import { prisma } from '@/database/prisma.js';
 
 type Service = {
-  name: string,
-  check: () => Promise<unknown>,
+  name: string;
+  check: () => Promise<unknown>;
 };
 type State = 'up' | 'down';
 type ServiceStates = Record<string, State>;
@@ -18,16 +18,11 @@ const availableServices: Service[] = [
   },
   {
     name: 'test',
-    check: () => new Promise((resolve, reject) => {
-      const randomNumber = Math.random();
-      if (randomNumber < 0.5) {
-        resolve(true);
+    check: () =>
+      new Promise((resolve, reject) => {
         reject();
-      } else {
-        reject();
-      }
-    }),
-  }
+      }),
+  },
 ];
 
 async function getServiceState(check: () => Promise<unknown>): Promise<State> {
@@ -40,26 +35,26 @@ async function getServiceState(check: () => Promise<unknown>): Promise<State> {
 }
 
 async function getServicesStates(services: Service[]): Promise<ServiceStates> {
-  const serviceStates: ServiceStates = {}
+  const serviceStates: ServiceStates = {};
 
   const serviceResults = await Promise.all(
     services.map(async (service) => {
       const state = await getServiceState(service.check);
       return {
         name: service.name,
-        state
-      }
+        state,
+      };
     })
-  ); 
+  );
 
   serviceResults.map((result) => {
     serviceStates[result.name] = result.state;
-  })
+  });
 
-  return serviceStates
+  return serviceStates;
 }
 
-export const getAppHealth = async(req: Request, res: Response) => {
+export const getAppHealth = async (req: Request, res: Response) => {
   const message = messageResponses[Math.floor(Math.random() * messageResponses.length)];
   const services = await getServicesStates(availableServices);
 

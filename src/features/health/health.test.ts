@@ -1,19 +1,34 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Request, Response } from 'express';
-import { healthCheck } from './health.controller.js';
+import { getAppHealth } from './health.controller.js';
 import { messageResponses } from './health.model.js';
 import { sendApiResponse } from '@/utils/apiResponse.js';
+import { HTTP_STATUS } from '@config/httpStatus.js';
+
+vi.mock('@/database/prisma.js', () => ({
+  prisma: {
+    $queryRaw: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
+  },
+}));
 
 vi.mock('@utils/apiResponse.js', () => ({
   sendApiResponse: vi.fn(),
 }));
 
 describe('Health Controller API', () => {
-  it('It should return valid message response', () => {
+  beforeEach(() => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.6);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should return valid health response with services and uptime', async () => {
     const fakeRequest = {} as Request;
     const fakeResponse = {} as Response;
 
-    healthCheck(fakeRequest, fakeResponse);
+    await getAppHealth(fakeRequest, fakeResponse);
 
     expect(sendApiResponse).toHaveBeenCalledTimes(1);
 
@@ -26,9 +41,16 @@ describe('Health Controller API', () => {
     expect(responseObject).toBe(fakeResponse);
 
     expect(payload).toEqual({
-      status: expect.any(Number),
+      status: HTTP_STATUS.OK,
       success: true,
       message: expect.any(String),
+      data: {
+        services: {
+          db: 'up',
+          test: 'down',
+        },
+        uptime: expect.any(Number),
+      },
     });
 
     expect(messageResponses).toContain(payload.message);
