@@ -3,7 +3,7 @@ import { env } from '@config/env.js';
 
 app.listen(env.PORT, () => {
   console.warn(`
-    Server suprisingly successfully started for "${env.NODE_ENV}" enviroment:
+    Server surprisingly successfully started for "${env.NODE_ENV}" environment:
     Listening on localhost:${env.PORT}
   `);
 });
